@@ -1,4 +1,4 @@
-import time
+import timeit
 import matplotlib.pyplot as plt
 
 def Recursive_Binary_Search(A, x, low, high):
@@ -6,37 +6,47 @@ def Recursive_Binary_Search(A, x, low, high):
         return -1  # Element not found
     
     mid = (low + high) // 2
+    
 
+     # Element found at index mid
     if A[mid] == x:
         return mid
+    # Search in the right half
     elif A[mid] < x:
         return Recursive_Binary_Search(A, x, mid + 1, high)
+    # Search in the left half
     else:
         return Recursive_Binary_Search(A, x, low, mid - 1)
 
-# Function to measure the runtime of the binary search
-def measure_runtime():
-    sizes = []  # List to store input array sizes
-    runtimes = []  # List to store corresponding runtimes
+def measure_runtime(n, num_runs=100000):
+    # Create a sorted list of size n
+    my_list = list(range(n))
+    
+    # Perform binary search on a target element not in the list
+    target = -1
+    
+    # Measure runtime using timeit
+    runtime = timeit.timeit(lambda: Recursive_Binary_Search(my_list, target, 0, n - 1), number=num_runs)
+    
+    # Calculate average runtime
+    average_runtime = runtime / num_runs
+    
+    return average_runtime
 
-    for size in range(1, 10001, 100):  # Vary the input size from 1 to 10,000
-        input_array = list(range(1, size + 1))  # Generate a sorted input array
+# Test different input sizes and measure runtimes
+input_sizes = [10, 10000, 40000, 60000, 80000, 100000]
+runtimes = []
 
-        start_time = time.time()  # Record the start time
-        target_index = Recursive_Binary_Search(input_array, size // 2, 0, size - 1)
-        end_time = time.time()  # Record the end time
+for size in input_sizes:
+    runtime = measure_runtime(size)
+    runtimes.append(runtime)
 
-        elapsed_time = end_time - start_time  # Calculate the elapsed time
-        sizes.append(size)
-        runtimes.append(elapsed_time)
+# Create a plot
+plt.plot(input_sizes, runtimes, marker='o')
+plt.xlabel('Input Size (n)')
+plt.ylabel('Average Runtime (seconds)')
+plt.title('Binary Search Runtime vs Input Size')
+plt.grid(True)
 
-    return sizes, runtimes
-
-# Measure runtime and create a plot
-sizes, runtimes = measure_runtime()
-plt.plot(sizes, runtimes)
-plt.xlabel("Input Array Size")
-plt.ylabel("Runtime (seconds)")
-plt.title("Runtime Analysis of Recursive Binary Search")
-plt.grid()
+# Show the plot
 plt.show()
